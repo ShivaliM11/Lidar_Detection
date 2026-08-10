@@ -15,11 +15,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Checkout original repository
-        uses: actions/checkout@v4
-        with:
-          repository: ShivaliM11/Competition_RoboCar
-          ref: 4954c614c461faea1c13eea868480575ab10db1b
-          path: original_repo
+  uses: actions/checkout@v4
+  with:
+    repository: ShivaliM11/Competition_RoboCar
+    ref: 4954c614c461faea1c13eea868480575ab10db1b
+    path: original_repo
+    token: ${{ secrets.SOURCE_REPO_TOKEN }}
 
       - name: Copy lidar_trial
         run: |
