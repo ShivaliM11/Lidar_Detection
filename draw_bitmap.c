@@ -6,7 +6,6 @@
 #include <string.h>
 #include "pixel_format_RGB.h"
 #include "draw_bitmap.h"
-
 #define ARRAYSIZE(A) (sizeof(A)/sizeof(A[0]))
 
 #define REPORT_TIME_DIFFERENCE  0
