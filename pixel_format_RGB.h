@@ -1,6 +1,5 @@
 /*
- * pixel_format_RGB.h
- 
+ * pixel_format_RGB.h 
  */
 
 #ifndef PIXEL_FORMAT_RGB_H_
