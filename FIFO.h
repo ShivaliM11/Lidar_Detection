@@ -1,8 +1,5 @@
 /*
  * FIFO.h
- *
- *  Created on: Feb 12, 2022
- *      Author: steveb
  */
 
 #ifndef FIFO_H_
@@ -25,8 +22,8 @@
     pthread_mutex_t   mutex; \
   }
 
-/* insert and remove operations
- * check that there is enough room to insert and that there is data to remove before executing!
+/* insert & remove operations
+ * check that there is enough room to insert & that there is data to remove before executing!
  */
 #define FIFO_INSERT( FIFO, NEW_DATUM ) /* FIFO is a pointer, NEW_DATUM is a value */ \
     do \
