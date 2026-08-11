@@ -1,10 +1,3 @@
-/*
- * wait_key.h
- *
- *  Created on: Mar 18, 2017
- *      Author: steveb
- */
-
 #ifndef WAIT_KEY_H_
 #define WAIT_KEY_H_
 
