@@ -1,10 +1,3 @@
-/*
- * enable_pwm_clock.c
- *
- *  Created on: Feb 3, 2018
- *      Author: steveb
- */
-
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
