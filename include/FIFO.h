@@ -1,8 +1,5 @@
 /*
  * FIFO.h
- *
- *  Created on: Feb 12, 2022
- *      Author: steveb
  */
 
 #ifndef FIFO_H_
