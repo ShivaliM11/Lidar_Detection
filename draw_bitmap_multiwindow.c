@@ -8,7 +8,6 @@
 #include "draw_bitmap_multiwindow.h"
 
 #define ARRAYSIZE(A) (sizeof(A)/sizeof(A[0]))
-
 #define REPORT_TIME_DIFFERENCE  0
 #define REPORT_PIXEL_VALUES     0
 
