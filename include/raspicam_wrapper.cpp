@@ -1,10 +1,3 @@
-/*
- * raspicam_wrapper.cpp
- *
- *  Created on: Mar 12, 2017
- *      Author: steveb
- */
-
 extern "C"
 {
 #include "raspicam_wrapper.h"
