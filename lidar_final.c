@@ -1,14 +1,11 @@
-
 /*
  * lidar_final.c
- * ASABE Student Robotics Competition 2026 - Plant Detection / Perception System
- *
- * Reads an 8x8 LiDAR grid and classifies the plant stand as empty, single, or double.
+ * Author : Shivali Munshi
+ * ASABE Student Robotics Competition 2026 -  Perception System
+ 
+ * Reads an 8x8 LiDAR grid & classifies the plant stand as empty, single, or double
  * Runs on the Raspberry Pi with the robot's other control code.
  */
-
-// Classification logic and LED mapping are based on lidar3.c.
-// Display and preview features are based on lidar1.c.
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,7 +26,7 @@
 
 #define ARRAYSIZE(X) (sizeof(X) / sizeof((X)[0]))
 
-// LiDAR grid and classification settings.
+// LiDAR grid & classification settings
 #define W 8
 #define H 8
 #define THRESH 127
@@ -37,17 +34,17 @@
 #define STABLE 2
 #define SINGLE_HOLD 30
 
-// GPIO pins for the three detection LEDs.
+// GPIO pins for the three detection LEDs
 #define LED_RED   10
 #define LED_BLUE  14
 #define LED_GREEN 15
 
-// Settings for the live LiDAR preview.
+// Settings for the live LiDAR preview
 #define PIXEL_WIDTH  50
 #define PIXEL_HEIGHT 50
 #define FILTER_DEPTH 4
 
-// Terminal rows used for each part of the display.
+// Terminal rows used for each part of the display
 #define RAW_GRID_TOP   2
 #define BIN_GRID_TOP  12
 #define STATUS_ROW    (BIN_GRID_TOP + H + 1)
@@ -55,21 +52,21 @@
 #define HIST_TOP_ROW  (HIST_HDR_ROW + 1)
 #define HIST_SHOW     12
 
-// ANSI colors used to match the LED states.
+// ANSI colors used to match the LED states
 #define COL_RED    "\x1B[31m"
 #define COL_GREEN  "\x1B[32m"
 #define COL_BLUE   "\x1B[34m"
 #define COL_YELLOW "\x1B[33m"
 #define COL_RESET  "\x1B[0m"
 
-// Stores one row of LiDAR readings and a complete 8x8 frame.
+// Stores one row of LiDAR readings and a complete 8x8 frame
 struct row_t   { unsigned int p[W]; };
 struct frame_t { struct row_t row[H]; };
 
 static const char *state_name[3]  = { "EMPTY", "single", "DOUBLE" };
 static const char *state_color[3] = { COL_RED, COL_GREEN, COL_BLUE };
 
-// Tracks which LED is currently on.
+// Tracks which LED is currently on
 static int led_state = -1;
 
 // Checks whether a column contains a detected object.
@@ -79,7 +76,7 @@ static bool col_active(struct frame_t *f, int c){
   return false;
 }
 
-// Counts active column groups to distinguish empty, single, and double plants.
+// Counts active column groups to distinguish empty, single, & double plants
 static int classify(struct frame_t *f){
   int groups=0, gap=GAP_COLS; bool in=false;
   for(int c=0;c<W;c++){
@@ -96,13 +93,13 @@ static int classify(struct frame_t *f){
   return 2;
 }
 
-// Reads one line from the LiDAR serial connection.
+// Reads one line from the LiDAR serial connection
 static void rdline(FILE*f,char*b,size_t n){
   char*l=NULL;size_t z=0;ssize_t g;b[0]=0;
   if(!f)return; g=getline(&l,&z,f); if(g>0&&l&&(size_t)g<n)strcpy(b,l); free(l);
 }
 
-// Sets the LED output and stores the current LED state.
+// Sets the LED output & stores current LED state
 static void leds(struct io_peripherals*io,int s){
   GPIO_CLR(io->gpio,LED_RED);GPIO_CLR(io->gpio,LED_BLUE);GPIO_CLR(io->gpio,LED_GREEN);
   if(s==0)GPIO_SET(io->gpio,LED_RED);
@@ -116,7 +113,7 @@ static char history[HIST_SHOW][96];
 static int  history_used   = 0;
 static int  total_changes  = 0;
 
-// Updates the status and detection history without scrolling the terminal.
+// Updates  status & detection history without scrolling terminal
 static void redraw_status(void){
   const char *name, *color;
 
@@ -137,7 +134,7 @@ static void redraw_status(void){
   fflush(stdout);
 }
 
-// Records a confirmed detection in the display and log file.
+// Records one confirmed detection in display &log file 
 static void register_change(int state, FILE *log_file){
   time_t     now = time(NULL);
   struct tm *tm  = localtime(&now);
@@ -162,7 +159,7 @@ static void register_change(int state, FILE *log_file){
   }
 }
 
-// Optional live grayscale preview for testing.
+// Optional live grayscale preview for testing
 static void draw_block(struct pixel_format_RGB *bitmap, size_t bitmap_width,
     size_t block_width, size_t block_height,
     size_t x_offset, size_t y_offset, struct pixel_format_RGB color){
@@ -171,13 +168,13 @@ static void draw_block(struct pixel_format_RGB *bitmap, size_t bitmap_width,
       bitmap[(y*bitmap_width)+x]=color;
 }
 
-// Converts a LiDAR distance into a black or white preview pixel.
+// Converts a LiDAR distance into a black or white pixel
 static void calculate_color(struct pixel_format_RGB *color, size_t threshold, size_t value){
   unsigned char gray = (value<=threshold)?0:255;
   color->R=gray; color->G=gray; color->B=gray;
 }
 
-// Averages recent frames to smooth the preview data.
+// Averages recent frames to smooth preview data
 static void filter_lidar_data(struct frame_t *hist_arr, size_t depth,
     struct frame_t *newest, struct frame_t *filtered){
   for(size_t i=1;i<depth;i++) hist_arr[i-1]=hist_arr[i];
@@ -193,23 +190,23 @@ static void filter_lidar_data(struct frame_t *hist_arr, size_t depth,
 }
 
 int main(void){
-  // Get access to the Pi GPIO registers.
+  // Get access to Pi GPIO registers
   struct io_peripherals *io = import_registers();
   if(!io){ printf("run with sudo\n"); return -1; }
 
-  // Set the LED GPIO pins as outputs.
+  // Set LED GPIO pins as outputs
   (*((volatile uint32_t*)&io->gpio->GPFSEL1)) &= ~((7<<0)|(7<<12)|(7<<15));
   (*((volatile uint32_t*)&io->gpio->GPFSEL1)) |=  ((1<<0)|(1<<12)|(1<<15));
   leds(io,-1);   // Start with all LEDs off.
 
-  // Open the LiDAR serial connection.
+  // Open lidar serial connection
   FILE *s = fopen("/dev/ttyACM0","r");
   if(!s){ printf("cannot open /dev/ttyACM0\n"); return -1; }
 
-  // Open the detection log without clearing previous results.
+  // open detection log without clearing prev results
   FILE *log_file = fopen("detections.log","a");
 
-  // Try to open the optional preview window.
+  // Try to open optional preview window
   int result = draw_bitmap_start(0, NULL);
   struct draw_bitmap_multiwindow_handle_t *bitmap_handle = NULL;
   static struct pixel_format_RGB bitmap[W*PIXEL_WIDTH*H*PIXEL_HEIGHT];
@@ -225,22 +222,22 @@ int main(void){
   char line[1024];
   struct frame_t fr; memset(&fr,0,sizeof(fr));
 
-  // State variables used to debounce and confirm plant detections.
+  // State variables used to debounce & confirm plant detections
   int confirmed=-1, cand=-1, cand_n=0, hold=0; bool holding=false;
   int key;
 
-  // Set up the terminal display.
+  // Set up terminal display
   printf("\x1B[2J\x1B[H\x1B[?25l");
   printf("\x1B[%d;1H--- distance (mm) ---\x1B[K", RAW_GRID_TOP-1);
   printf("\x1B[%d;1H--- detection (1 = within 5 in) ---\x1B[K", BIN_GRID_TOP-1);
   redraw_status();
 
-  // Read LiDAR frames until the preview closes or q is pressed.
+  // Read lidar frames until preview closes or q is pressed
   while( ((bitmap_handle==NULL) || !draw_bitmap_window_closed(bitmap_handle)) &&
          !wait_key(1,&key) ){
     if(key=='q') break;
 
-    // Read and validate the next LiDAR row.
+    // Read& validate next lidar row
     rdline(s,line,sizeof(line));
     if(!(line[0]=='y'&&line[1]>='0'&&line[1]<='7'&&strlen(line)>3)) continue;
     int r=line[1]-'0';
@@ -248,12 +245,12 @@ int main(void){
       &fr.row[r].p[0],&fr.row[r].p[1],&fr.row[r].p[2],&fr.row[r].p[3],
       &fr.row[r].p[4],&fr.row[r].p[5],&fr.row[r].p[6],&fr.row[r].p[7]);
 
-    // Display the current raw distance readings.
+    // Display current raw distance readings
     printf("\x1B[%d;1H%d:", RAW_GRID_TOP+r, r);
     for(int c=0;c<W;c++) printf(" %4u", fr.row[r].p[c]);
     printf("\x1B[K");
 
-    // Display which LiDAR cells are detecting an object.
+    // Display which LiDAR cells are detecting an obj
     printf("\x1B[%d;1H%d:", BIN_GRID_TOP+r, r);
     for(int c=0;c<W;c++){
       bool on = fr.row[r].p[c] <= THRESH;
@@ -263,10 +260,10 @@ int main(void){
     printf("\x1B[K");
     fflush(stdout);
 
-    // Wait until all 8 rows are received before classifying the frame.
+    // Wait until all 8 rows are received before classification
     if(r!=H-1) continue;
 
-    // Classify the completed LiDAR frame and update the debounce counter.
+    // Classify  completed LiDAR frame &update  debounce counter
     int st=classify(&fr);
     if(st==cand) cand_n++; else { cand=st; cand_n=1; }
 
@@ -286,7 +283,7 @@ int main(void){
       }
     }
 
-    // Hold a possible single until we know a second stalk is not present.
+    // Hold a possible single until we know a second stalk is not present
     if(holding){
       int now=classify(&fr);
       if(now==2){
@@ -301,10 +298,10 @@ int main(void){
       }
     }
 
-    // Update the terminal status and detection history.
+    // Update terminal status & detection history
     redraw_status();
 
-    // Update the optional grayscale LiDAR preview.
+    // Update  optional grayscale LiDAR preview
     filter_lidar_data(frame_history, FILTER_DEPTH, &fr, &filtered_frame);
     if(bitmap_handle != NULL){
       struct pixel_format_RGB color;
@@ -319,7 +316,7 @@ int main(void){
     }
   }
 
-  // Print final totals and close the log file.
+  // Print final totals& close log file
   printf("\x1B[?25h\x1B[%d;1H", HIST_TOP_ROW + HIST_SHOW + 1);
   printf("==== FINAL ==== S:%d D:%d E:%d\n", counts[1], counts[2], counts[0]);
   if(log_file){
@@ -332,9 +329,9 @@ int main(void){
   if(bitmap_handle != NULL) draw_bitmap_close_window(bitmap_handle);
   draw_bitmap_stop();
 
-  leds(io,-1);   // Turn off all LEDs before exiting.
+  leds(io,-1);   // Turn off all LEDs before exiting
   (*((volatile uint32_t*)&io->gpio->GPFSEL1)) &= ~((7<<0)|(7<<12)|(7<<15));
 
   return 0;
 }
-```
+
