@@ -3,15 +3,14 @@
 #include <pthread.h>
 #include "wait_period.h"
 
-/* initialize the period by setting the timer statet to the current time */
+//initialize period by setting timer statet to current time
 void wait_period_initialize( struct timespec * timer_state )
 {
     clock_gettime( CLOCK_REALTIME, timer_state );
 
     return;
 }
-
-/* wait the specified amount of time relative to the previous period's end point */
+// wait  specified amount of time relative to previous period's end point */
 void wait_period( struct timespec * timer_state, unsigned long milliseconds )
 {
     pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
