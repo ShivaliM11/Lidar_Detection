@@ -1,10 +1,3 @@
-/*
- * bsc.h
- *
- *  Created on: Apr 24, 2021
- *      Author: steveb
- */
-
 #ifndef BSC_H_
 #define BSC_H_
 
