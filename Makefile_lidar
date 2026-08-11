@@ -1,5 +1,4 @@
 CFLAGS=`pkg-config --cflags --libs gtk4` -Wall -Werror -Wno-deprecated-declarations -g
-
 all: lidar1
 
 lidar1: lidar1.o draw_bitmap_multiwindow.o wait_key.o import_registers.o
