@@ -1,10 +1,3 @@
-/*
- * wait_key.c
- *
- *  Created on: Mar 18, 2017
- *      Author: steveb
- */
-
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
