@@ -1,1 +1,127 @@
-Readme
+# Lidar Plant Detection 
+# Author : Shivali Munshi 
+# Pennsylvania State University
+
+Real-time plant stand classifier running on a Raspberry Pi 4, written in C.
+Reads an 8×8 LiDAR distance grid and classifies each plant slot as Empty, Single, or Double at required speed.
+
+ #What it does :
+
+Empty = No plant in slot   =   Red 
+Single = One green plant   =   Green 
+Double = Green + yellow plant  =  Blue 
+
+The classifier feeds directly into the robot's navigation and actuation systems. On a confirmed double detection, the system signals the camera thread to identify the yellow plant for removal by the robotic arm.
+
+# Hardware
+
+- Raspberry Pi 4
+- DFRobot 8×8 Matrix 64-Pixel ToF LiDAR Sensor (VL53L5CX-based, USB/serial)
+- RGB LEDs on GPIO 14 (blue), 15 (green), 10 (red)
+
+
+## How it works
+
+Serial (/dev/ttyACM0)
+        |
+        v
+ [Thread 1 — Receiving]
+  Reads 8x8 distance frame every 10ms
+  Applies 4-frame temporal averaging filter
+        |
+        v (frame queue / mutex)
+        |
+ [Thread 2 — Controller]
+  Applies distance threshold to binary mask
+  Flood-fill blob counting on masked pixels
+  0 blobs → Empty
+  1 blob  → Single
+  2 blobs → Double
+  Sends LED command via FIFO queue
+        |
+        v (LED command queue / mutex)
+        |
+ [Thread 3 — LED]
+  Writes GPIO pins via libgpiod v2
+
+
+Terminal output every frame:
+
+=== DISTANCE GRID (mm) ===
+y0:   38   41   55  4000  4000  4000  4000  4000
+y1:   52   54  4000  4000  4000  4000  4000  4000
+...
+
+=== BINARY GRID (1=plant 0=bg) ===
+y0:    1    1    1    0    0    0    0    0
+y1:    1    1    0    0    0    0    0    0
+...
+
+=== CLASSIFICATION ===
+Blobs: 2  ->  DOUBLE (LED: BLUE)
+Threshold: 216 mm
+
+
+GTK window shows the 8×8 grid as a black/white bitmap (black = plant, white = background).
+
+
+
+## Build
+
+sudo apt-get install libgtk-4-dev libgpiod-dev
+
+gcc lidar6.c draw_bitmap_multiwindow.c wait_key.c \
+    $(pkg-config --cflags --libs gtk4) \
+    -Wall -Wno-deprecated-declarations -g \
+    -o lidar6 -lm -lpthread -lgpiod
+
+
+## Run this : 
+sudo chmod a+rw /dev/gpiochip0
+DISPLAY=:0 ./lidar_final
+
+
+On first launch: aim sensor at an empty slot and press Enter to calibrate the baseline distance threshold automatically.
+
+
+## Calibration
+
+The program measures background distance at startup and sets:
+
+threshold = baseline_average - 150mm
+
+Anything closer than the threshold = plant (black). Everything else = background (white). No hardcoded distance needed — adapts to each deployment location.
+
+To tune sensitivity, adjust `BASELINE_MARGIN` in `lidar_final.c`:
+- Lower value → stricter (fewer false positives, may miss distant plants)
+- Higher value → more sensitive (catches more, may pick up ground/noise)
+
+---
+
+## File structure = Build files created by Steven B. & Dr. Kyunsun Choi
+
+ `draw_bitmap_multiwindow.c/h` = GTK4 multi-window bitmap display (professor-provided) 
+`wait_key.c/h` = Non-blocking keypress detection (professor-provided) 
+`pixel_format_RGB.h` = RGB pixel struct (professor-provided) 
+ `Makefile` = Build rules 
+
+
+## Competition notes
+
+- Tested under lab lighting and recalibrated on-site for ballroom lighting conditions
+- Sensor mounted horizontally on robot chassis, facing the plant slot
+- Detection stable on moving chassis with 4-frame temporal filter + debounce layer
+- Blob-counting approach is lighting-independent (distance only, no color)
+
+
+## Related systems (team)
+
+- Line-following (camera + IR sensors) — navigation
+- Motor control — PWM drive
+- Camera color detection — yellow plant identification
+- Robotic arm actuation — yellow plant removal
+
+
+## Links
+- GitHub: https://github.com/ShivaliM11/Lidar_Detection
+- Technical Report: https://www.researchgate.net/publication/410626724_Crop_Counter_Type_Detector
