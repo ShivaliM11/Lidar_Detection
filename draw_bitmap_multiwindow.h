@@ -14,7 +14,6 @@
  * If the GUI thread cannot display fast enough to keep up with the timer, the display will not update.
  * Neither the GUI thread nor the main thread will block, but the display will not make progress.
  */
-
 struct draw_bitmap_multiwindow_data_interface_t
 {
     /* dynamic data */
