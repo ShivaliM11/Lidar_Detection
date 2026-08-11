@@ -1,10 +1,3 @@
-/*
- * pwm.h
- *
- *  Created on: Dec 27, 2016
- *      Author: steveb
- */
-
 #ifndef PWM_H_
 #define PWM_H_
 
