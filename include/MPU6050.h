@@ -1,10 +1,3 @@
-/*
- * MPU6050.h
- *
- *           Author: steveb
- *       Created on: March 04, 2022
- */
-
 #ifndef MPU6050_H_
 #define MPU6050_H_
 
