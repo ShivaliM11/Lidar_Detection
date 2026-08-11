@@ -17,9 +17,9 @@
 
 struct io_peripherals * import_registers( void )
 {
-  static struct io_peripherals  io;           /* the structure whose pointers are being initialized */
-  struct io_peripherals *       return_value; /* the return value of this function */
-  int                           mmap_file;    /* the file descriptor used to map the memory */
+  static struct io_peripherals  io;           /* struct whose pointers are being initialized */
+  struct io_peripherals *       return_value; /* return value of this function */
+  int                           mmap_file;    /*  file descriptor used to map the memory */
   off_t                         page_size;    /* specify how large a window is mapped per register */
 
   mmap_file = open( "/dev/mem", O_RDWR|O_SYNC|O_CLOEXEC );
@@ -27,7 +27,7 @@ struct io_peripherals * import_registers( void )
   {
     page_size = 4096;
 
-    /* try to put the physical I/O space at the same address range in the virtual address space */
+    /* try to put the physical I/O space at same address range in virtual address space */
     io.cm = mmap( 0, page_size, PROT_READ|PROT_WRITE, MAP_SHARED, mmap_file, PHYSICAL_ADDRESS+0x101000 );
     if (io.cm != MAP_FAILED)
     {
