@@ -18,22 +18,6 @@ static long time_difference_ms( struct timespec *start_time, struct timespec *en
 }
 #endif
 
-/*
- * What is the following interface?
- * Normally, I prefer inter-thread communication to come in one of two forms:
- * [1] a "flag" where no history is maintained, every write stomps on whatever was there
- * [2] a "queue" where all history is maintained, there is a backlog of previous writes to be read
- *
- * The following structure is somewhat similar to the queue option in that there is some history.
- * In this case, a reader active in the communication channel switches the mode of operation of the interface to that of a flag; the writer stomps on the data not being read.
- * When no reader is in the channel, a writer will ping-pong between the two bitmaps.
- * The reader only ever cares about the most recent bitmap.
- * The writer tries to update the oldest bitmap. Sometimes, the writer does not have that opportunity because the reader is using the oldest bitmap.
- *
- * Note:
- * If the GUI thread cannot display fast enough to keep up with the timer, the display will not update.
- * Neither the GUI thread nor the main thread will block, but the display will not make progress.
- */
 static struct data_interface_t
 {
     /* dynamic data */
