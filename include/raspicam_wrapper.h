@@ -1,10 +1,3 @@
-/*
- * raspicam_wrapper.h
- *
- *  Created on: Mar 12, 2017
- *      Author: steveb
- */
-
 #ifndef RASPICAM_WRAPPER_H_
 #define RASPICAM_WRAPPER_H_
 
