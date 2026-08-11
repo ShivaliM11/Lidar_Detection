@@ -1,10 +1,5 @@
 /*
  * MPU9250.h
- *
- *           Author: steveb
- *       Created on: March 12, 2021
- *  Last updated on: March 07, 2022
- *       Updated by: K.Choi
  */
 
 #ifndef MPU9250_H_
