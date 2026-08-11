@@ -120,4 +120,3 @@ struct gpio_register
   uint32_t GPPUDCLK0;
   uint32_t GPPUDCLK1;
 };
-
