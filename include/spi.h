@@ -1,10 +1,3 @@
-/*
- * spi.h
- *
- *  Created on: Jan 29, 2017
- *      Author: steveb
- */
-
 #ifndef SPI_H_
 #define SPI_H_
 
