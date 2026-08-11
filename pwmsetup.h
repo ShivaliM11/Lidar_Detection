@@ -1,6 +1,7 @@
 #ifndef PWM_SETUP_H_
 #define PWM_SETUP_H_
 
+// Sets up PWM timing and connects it to the mapped I/O peripherals
 void pwm_setup(int pwm_range, struct io_peripherals *io);
 
 #endif /* PWM_SETUP_H_ */
