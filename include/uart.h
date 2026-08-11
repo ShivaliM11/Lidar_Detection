@@ -1,10 +1,3 @@
-/*
- * uart.h
- *
- *  Created on: Feb 15, 2020
- *      Author: steveb
- */
-
 #ifndef UART_H_
 #define UART_H_
 
