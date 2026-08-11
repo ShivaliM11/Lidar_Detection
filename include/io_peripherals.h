@@ -1,11 +1,3 @@
-/*
- * io_peripherals.h
- *
- *  Created on:      Feb.   3, 2018
- *  Last updated on: March  4, 2022
- *      Author: steveb
- */
-
 #ifndef IO_PERIPHERALS_H_
 #define IO_PERIPHERALS_H_
 
